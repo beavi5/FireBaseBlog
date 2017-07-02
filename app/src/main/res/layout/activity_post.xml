@@ -55,7 +55,7 @@
         android:background="@drawable/input_outline"
         android:ems="10"
         android:hint="Post description"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         android:padding="15dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"

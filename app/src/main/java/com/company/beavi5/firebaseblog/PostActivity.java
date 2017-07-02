@@ -83,9 +83,10 @@ public class PostActivity extends AppCompatActivity {
                 DatabaseReference newPost = mDatabase.push();
                     newPost.child("title").setValue(title_val);
                     newPost.child("desc").setValue(desc_val);
-                    newPost.child("image").setValue(downloadUrl.toString()); 
+                    newPost.child("image").setValue(downloadUrl.toString());
 
                 mProgress.dismiss();
+                    startActivity(new Intent(PostActivity.this,MainActivity.class));
                 }
             });
 
