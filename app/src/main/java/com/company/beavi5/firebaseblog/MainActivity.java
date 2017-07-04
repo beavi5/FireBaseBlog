@@ -2,6 +2,7 @@ package com.company.beavi5.firebaseblog;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -21,9 +23,28 @@ import com.squareup.picasso.Picasso;
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mBlogList;
     private DatabaseReference mDatabase;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser()==null)
+                {
+                    Intent registerIntent = new Intent(MainActivity.this, RegisterActivity.class);
+                    registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(registerIntent);
+                }
+            }
+        };
 
         setContentView(R.layout.activity_main);
         mDatabase= FirebaseDatabase.getInstance().getReference().child("Blog");
@@ -31,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
        mBlogList.setHasFixedSize(true);
       LinearLayoutManager mllm = new LinearLayoutManager(this);
         mllm.setStackFromEnd(true);
-mllm.setReverseLayout(true);
+        mllm.setReverseLayout(true);
 
         mBlogList.setLayoutManager(mllm);
 
@@ -42,13 +63,20 @@ mllm.setReverseLayout(true);
         if (item.getItemId() == R.id.action_add) {
             startActivity(new Intent(MainActivity.this,PostActivity.class));
         }
+        if (item.getItemId() == R.id.action_logout) {
+        logout();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        mAuth.signOut();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
+            mAuth.addAuthStateListener(mAuthListener);
         FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<Blog, BlogViewHolder>(Blog.class,R.layout.post_row,BlogViewHolder.class, mDatabase) {
             @Override
