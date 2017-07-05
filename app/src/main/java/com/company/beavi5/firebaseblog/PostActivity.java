@@ -74,6 +74,7 @@ public class PostActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(title_val)&&!TextUtils.isEmpty(desc_val)&& mImageUri !=null){
             mProgress.show();
             StorageReference filepath  = mStorage.child("blog_images").child(mImageUri.getLastPathSegment());
+
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {

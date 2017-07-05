@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser()==null)
                 {
-                    Intent registerIntent = new Intent(MainActivity.this, RegisterActivity.class);
+                    Intent registerIntent = new Intent(MainActivity.this, LoginActivity.class);
                     registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(registerIntent);
                 }
@@ -82,7 +82,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, int position) {
             viewHolder.post_title.setText(model.getTitle());
-            viewHolder.post_desc.setText(model.getDesc());
+           // if (mAuth.getCurrentUser().getEmail().equals("qqwerty@gmail.com"))  viewHolder.post_desc.setText("OPA C!!!6un");
+             //   else
+
+                viewHolder.post_desc.setText(model.getDesc());
+
 //            viewHolder.post_desc.setMaxEms(3);
             viewHolder.post_desc.setOnClickListener(
                     new View.OnClickListener() {
@@ -106,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        Toast.makeText(getApplicationContext(), "aaaaaa", Toast.LENGTH_SHORT).show();
 
         mBlogList.setAdapter(firebaseRecyclerAdapter);
 
