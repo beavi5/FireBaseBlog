@@ -25,7 +25,7 @@ private EditText mLoginEmailField, mLoginPasswordField;
     private Button mLoginBtn, mRegisterBtn;
     private FirebaseAuth mAuth;
 
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabaseUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,8 @@ private EditText mLoginEmailField, mLoginPasswordField;
 
         mAuth=FirebaseAuth.getInstance();
 
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("Users");
+        mDatabaseUsers= FirebaseDatabase.getInstance().getReference().child("Users");
+        mDatabaseUsers.keepSynced(true);
 
         mLoginEmailField = (EditText) findViewById(R.id.loginEmailField);
         mLoginPasswordField = (EditText) findViewById(R.id.loginPasswordField);
@@ -86,7 +87,7 @@ private EditText mLoginEmailField, mLoginPasswordField;
 
         final String user_id = mAuth.getCurrentUser().getUid();
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
              if (dataSnapshot.hasChild(user_id)){
@@ -98,10 +99,12 @@ private EditText mLoginEmailField, mLoginPasswordField;
              }
              else
              {
-                 Toast.makeText(LoginActivity.this, "You need to setup new account", Toast.LENGTH_LONG).show();
+
+                 Intent mainIntent = new Intent(LoginActivity.this, SetupActivity.class);
+                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                 startActivity(mainIntent);
              }
 
-mDatabase.getKey();
             }
 
 
