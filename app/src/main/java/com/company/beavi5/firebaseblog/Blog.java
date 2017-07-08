@@ -6,7 +6,15 @@ package com.company.beavi5.firebaseblog;
 
 public class Blog  {
 
-    public String title,desc,image;
+    public String title,desc,image,uid;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     public String getTitle() {
         return title;
@@ -36,7 +44,8 @@ public class Blog  {
 
     }
 
-    public Blog(String title, String desc, String image) {
+    public Blog(String title, String desc, String image, String uid) {
+        this.uid = uid;
 
         this.title = title;
         this.desc = desc;

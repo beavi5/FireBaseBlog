@@ -1,8 +1,11 @@
 package com.company.beavi5.firebaseblog;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -50,11 +54,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         setContentView(R.layout.activity_main);
+
         mDatabase= FirebaseDatabase.getInstance().getReference().child("Blog");
-        mDatabase.keepSynced(true);
+       mDatabase.keepSynced(true);
 
         mDatabaseUsers= FirebaseDatabase.getInstance().getReference().child("Users");
-        mDatabaseUsers.keepSynced(true);
+       // mDatabaseUsers.keepSynced(true);
 
         mBlogList = (RecyclerView) findViewById(R.id.blog_list);
        mBlogList.setHasFixedSize(true);
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_add) {
-            startActivity(new Intent(MainActivity.this,PostActivity.class));
+            startActivity(new Intent(MainActivity.this,PostActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }
         if (item.getItemId() == R.id.action_logout) {
         logout();
@@ -119,9 +124,52 @@ public class MainActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<Blog, BlogViewHolder>(Blog.class,R.layout.post_row,BlogViewHolder.class, mDatabase) {
             @Override
-            protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, int position) {
+            protected void populateViewHolder(final BlogViewHolder viewHolder, final Blog model, final int position) {
+
+
             viewHolder.post_title.setText(model.getTitle());
-           // if (mAuth.getCurrentUser().getEmail().equals("qqwerty@gmail.com"))  viewHolder.post_desc.setText("OPA C!!!6un");
+            if (mAuth.getCurrentUser().getUid().equals(model.getUid()))  viewHolder.delete_post_btn.setVisibility(View.VISIBLE);
+                else viewHolder.delete_post_btn.setVisibility(View.INVISIBLE); // очистка
+
+            viewHolder.delete_post_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                   final DatabaseReference mDatabasePostRef= getRef(viewHolder.getAdapterPosition());
+                    final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(MainActivity.this);
+                deleteDialog.setTitle("Delete post");
+                    deleteDialog.setMessage("You sure want delete post?");
+                    deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mDatabasePostRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(MainActivity.this, "Post was deleted...", Toast.LENGTH_SHORT).show();
+                                }
+                    });
+
+
+                           // notifyDataSetChanged();
+
+                        }
+                    });
+
+                    deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    deleteDialog.show();
+                 //   notifyDataSetChanged();
+                  //  FirebaseDatabase.getInstance().getReference().child("Blog");
+
+
+                }
+            });
+
+                //viewHolder.post_desc.setText("OPA C!!!6un");
              //   else
 
                 viewHolder.post_desc.setText(model.getDesc());

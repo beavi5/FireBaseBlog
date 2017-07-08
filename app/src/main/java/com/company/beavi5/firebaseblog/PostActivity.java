@@ -10,14 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -26,6 +30,8 @@ public class PostActivity extends AppCompatActivity {
     private Uri mImageUri;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
 
     private ProgressDialog mProgress;
 
@@ -35,6 +41,9 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
+        mAuth=FirebaseAuth.getInstance();
+        mCurrentUser=mAuth.getCurrentUser();
 
         mStorage = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Blog");
@@ -85,9 +94,12 @@ public class PostActivity extends AppCompatActivity {
                     newPost.child("title").setValue(title_val);
                     newPost.child("desc").setValue(desc_val);
                     newPost.child("image").setValue(downloadUrl.toString());
+                    newPost.child("uid").setValue(mCurrentUser.getUid());
 
                 mProgress.dismiss();
-                    startActivity(new Intent(PostActivity.this,MainActivity.class));
+                    ((ImageView)findViewById(R.id.imageSelect)).setImageBitmap(null);
+                    startActivity(new Intent(PostActivity.this,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+
                 }
             });
 
@@ -102,7 +114,11 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode==GALLERY_REQUEST && resultCode==RESULT_OK) {
              mImageUri = data.getData();
-            mSelectImage.setImageURI(mImageUri);
+            Picasso.with(this)
+                    .load(mImageUri)
+                    .fit().centerInside()
+                    .into(mSelectImage);
+            //mSelectImage.setImageURI(mImageUri);
 
 
 
