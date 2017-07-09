@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         mllm.setReverseLayout(true);
 
         mBlogList.setLayoutManager(mllm);
-
+        checkUserExist();
     }
 
 
@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(user_id)){
-                    Intent mainIntent = new Intent(MainActivity.this, SetupActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
+                    Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(setupIntent);
 
                 }
 
