@@ -41,7 +41,7 @@ private ProgressDialog mProgress;
         setContentView(R.layout.activity_setup);
 
         mAuth=FirebaseAuth.getInstance();
-        mStorageImage=FirebaseStorage.getInstance().getReference().child("Profile_images");
+        mStorageImage=FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -77,7 +77,7 @@ private ProgressDialog mProgress;
         {
 
             mProgress.setMessage("Finishing setup ...");
-
+            mProgress.show();
             StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -105,6 +105,7 @@ private ProgressDialog mProgress;
 
         if (requestCode==GALLERY_REQUEST && resultCode==RESULT_OK){
          mImageUri = data.getData();
+
 
             CropImage.activity(mImageUri)
                     .setGuidelines(CropImageView.Guidelines.ON)

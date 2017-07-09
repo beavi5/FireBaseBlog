@@ -67,14 +67,18 @@ public class RegisterActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful())
                 {
-                    String user_id = mAuth.getCurrentUser().getUid();
-                    DatabaseReference current_user_db =  mDatabase.child(user_id);
-                    current_user_db.child("Name").setValue(name);
-                    current_user_db.child("image").setValue("default");
+//                    String user_id = mAuth.getCurrentUser().getUid();
+//                    DatabaseReference current_user_db =  mDatabase.child(user_id);
+//                    current_user_db.child("Name").setValue(name);
+//                    current_user_db.child("image").setValue("default");
                     mProgress.dismiss();
-                    Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                  startActivity(mainIntent);
+//                    Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+//                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                  startActivity(mainIntent);
+
+                    Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
+                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(setupIntent);
 
 
                 }
