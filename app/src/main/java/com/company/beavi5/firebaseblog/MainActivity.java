@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabaseUsers;
+    private DatabaseReference mDatabaseLike;
+
+
+    private boolean mProcessLike =false;
 
 
     @Override
@@ -48,24 +52,28 @@ public class MainActivity extends AppCompatActivity {
                 {
                     Intent registerIntent = new Intent(MainActivity.this, LoginActivity.class);
                     registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    Log.d("act", "MAIN - ща стартанем авторизацию");
                     startActivity(registerIntent);
                 }
             }
         };
 
         setContentView(R.layout.activity_main);
-
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase= FirebaseDatabase.getInstance().getReference().child("Blog");
        mDatabase.keepSynced(true);
 
         mDatabaseUsers= FirebaseDatabase.getInstance().getReference().child("Users");
-       // mDatabaseUsers.keepSynced(true);
+        mDatabaseLike= FirebaseDatabase.getInstance().getReference().child("Likes");
+       mDatabaseUsers.keepSynced(true);
 
         mBlogList = (RecyclerView) findViewById(R.id.blog_list);
        mBlogList.setHasFixedSize(true);
       LinearLayoutManager mllm = new LinearLayoutManager(this);
         mllm.setStackFromEnd(true);
         mllm.setReverseLayout(true);
+
+        Log.d("act", "MAIN - еще не стартанулась?))");
 
         mBlogList.setLayoutManager(mllm);
         checkUserExist();
@@ -76,28 +84,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkUserExist() {
 
-        final String user_id = mAuth.getCurrentUser().getUid();
 
-        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(user_id)){
-                    Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
-                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(setupIntent);
+        if (mAuth.getCurrentUser()!=null) {
+            final String user_id = mAuth.getCurrentUser().getUid();
+
+            mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChild(user_id)){
+                        Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+                        setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(setupIntent);
+
+                    }
+
+
 
                 }
 
 
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+                }
+            });
+        }
 
     }
 
@@ -126,12 +137,58 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final BlogViewHolder viewHolder, final Blog model, final int position) {
 
+            final String post_key = getRef(position).getKey();
 
             viewHolder.post_title.setText(model.getTitle());
-            if (mAuth.getCurrentUser().getUid().equals(model.getUid()))  viewHolder.delete_post_btn.setVisibility(View.VISIBLE);
-                else viewHolder.delete_post_btn.setVisibility(View.INVISIBLE); // очистка
+                viewHolder.setLikeBtn(post_key);
 
-            viewHolder.delete_post_btn.setOnClickListener(new View.OnClickListener() {
+            viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+
+                viewHolder.mLikeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    mProcessLike = true;
+
+                        mDatabaseLike.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (mProcessLike){
+                                if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
+
+                                    mDatabaseLike.child(post_key).child(mAuth.getCurrentUser().getUid()).removeValue();
+
+                                    mProcessLike=false;
+                                }
+                                else
+                                {
+                                    mDatabaseLike.child(post_key).child(mAuth.getCurrentUser().getUid()).setValue("RandomValue");
+
+                                    mProcessLike=false;
+                                }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                });
+
+
+           if (mAuth.getCurrentUser().getUid().equals(model.getUid()))  viewHolder.mDeleteBtn.setVisibility(View.VISIBLE);
+                else viewHolder.mDeleteBtn.setVisibility(View.INVISIBLE); // очистка
+
+           viewHolder.mDeleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -139,9 +196,17 @@ public class MainActivity extends AppCompatActivity {
                     final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(MainActivity.this);
                 deleteDialog.setTitle("Delete post");
                     deleteDialog.setMessage("You sure want delete post?");
+                    deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+
                     deleteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
                             mDatabasePostRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -155,12 +220,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                    deleteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
                     deleteDialog.show();
                  //   notifyDataSetChanged();
                   //  FirebaseDatabase.getInstance().getReference().child("Blog");
@@ -173,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
              //   else
 
                 viewHolder.post_desc.setText(model.getDesc());
+                viewHolder.post_username.setText(model.getUsername());
 
 //            viewHolder.post_desc.setMaxEms(3);
             viewHolder.post_desc.setOnClickListener(

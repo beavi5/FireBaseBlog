@@ -26,22 +26,22 @@ public class SetupActivity extends AppCompatActivity {
     private ImageButton mSetupImageBtn;
     private EditText mNameField;
     private Button mSubmitBtn;
-private Uri mImageUri;
-private DatabaseReference mDatabaseUsers;
+    private Uri mImageUri;
+    private DatabaseReference mDatabaseUsers;
     private FirebaseAuth mAuth;
-private StorageReference mStorageImage;
-private ProgressDialog mProgress;
+    private StorageReference mStorageImage;
+    private ProgressDialog mProgress;
 
 
-    private static final int GALLERY_REQUEST =1;
+    private static final int GALLERY_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
 
-        mAuth=FirebaseAuth.getInstance();
-        mStorageImage=FirebaseStorage.getInstance().getReference().child("profile_images");
+        mAuth = FirebaseAuth.getInstance();
+        mStorageImage = FirebaseStorage.getInstance().getReference().child("profile_images");
 
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -53,11 +53,11 @@ private ProgressDialog mProgress;
         mSetupImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent =  new Intent();
+                Intent galleryIntent = new Intent();
 
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,GALLERY_REQUEST);
+                startActivityForResult(galleryIntent, GALLERY_REQUEST);
             }
         });
 
@@ -72,9 +72,8 @@ private ProgressDialog mProgress;
 
     private void startSetupAccount() {
         final String name = mNameField.getText().toString().trim();
-        final String user_id=mAuth.getCurrentUser().getUid();
-        if (!TextUtils.isEmpty(name)&&mImageUri!=null)
-        {
+        final String user_id = mAuth.getCurrentUser().getUid();
+        if (!TextUtils.isEmpty(name) && mImageUri != null) {
 
             mProgress.setMessage("Finishing setup ...");
             mProgress.show();
@@ -103,25 +102,25 @@ private ProgressDialog mProgress;
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (requestCode==GALLERY_REQUEST && resultCode==RESULT_OK){
-         mImageUri = data.getData();
+        if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
+            mImageUri = data.getData();
 
 
             CropImage.activity(mImageUri)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
+                    .setAspectRatio(1, 1)
                     .start(this);
         }
 
-            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-                CropImage.ActivityResult result = CropImage.getActivityResult(data);
-                if (resultCode == RESULT_OK) {
-                    Uri resultUri = result.getUri();
-                    mSetupImageBtn.setImageURI(resultUri);
-                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Exception error = result.getError();
-                }
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                mSetupImageBtn.setImageURI(resultUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
+        }
 
 
     }
