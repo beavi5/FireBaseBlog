@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
+
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mBlogList;
     private DatabaseReference mDatabase;
@@ -61,11 +63,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase= FirebaseDatabase.getInstance().getReference().child("Blog");
-       mDatabase.keepSynced(true);
+       mDatabase.keepSynced(false);
 
         mDatabaseUsers= FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseLike= FirebaseDatabase.getInstance().getReference().child("Likes");
-       mDatabaseUsers.keepSynced(true);
+       mDatabaseUsers.keepSynced(false);
 
         mBlogList = (RecyclerView) findViewById(R.id.blog_list);
        mBlogList.setHasFixedSize(true);
@@ -145,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
             viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                Intent singlePostIntent = new Intent(MainActivity.this, SinglePost.class);
+                    startActivity(singlePostIntent.putExtra("postId",post_key));
                 }
             });
 
@@ -163,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
 
                                     mDatabaseLike.child(post_key).child(mAuth.getCurrentUser().getUid()).removeValue();
 
-                                    mProcessLike=false;
+
+                                     mProcessLike=false;
                                 }
                                 else
                                 {

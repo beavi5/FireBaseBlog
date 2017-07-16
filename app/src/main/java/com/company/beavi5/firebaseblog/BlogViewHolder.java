@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class BlogViewHolder extends RecyclerView.ViewHolder {
+      TextView mLikeCount;
     ImageButton mDeleteBtn;
     View mView;
     public ImageButton mLikeBtn;
@@ -42,6 +43,7 @@ public class BlogViewHolder extends RecyclerView.ViewHolder {
 
       //  delete_post_btn= (Button) mView.findViewById(R.id.deletePostBtn);
         mLikeBtn= (ImageButton) mView.findViewById(R.id.like_btn);
+        mLikeCount= (TextView) mView.findViewById(R.id.post_like_count);
         mDeleteBtn= (ImageButton) mView.findViewById(R.id.delete_post);
         image = (ImageView) mView.findViewById(R.id.post_image);
         post_desc = (TextView) mView.findViewById(R.id.post_text);
@@ -57,6 +59,7 @@ public class BlogViewHolder extends RecyclerView.ViewHolder {
         mDatabaseLike.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
 
                 mLikeBtn.setImageResource(R.drawable.like_red);
@@ -67,6 +70,7 @@ public class BlogViewHolder extends RecyclerView.ViewHolder {
                     mLikeBtn.setImageResource(R.drawable.like_gray);
 
                 }
+                mLikeCount.setText(""+dataSnapshot.child(post_key).getChildrenCount());
             }
 
             @Override
