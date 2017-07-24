@@ -33,7 +33,7 @@ private EditText mLoginEmailField, mLoginPasswordField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("act", "ЛОГИН - а сейчас запустилась)");
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -71,6 +71,10 @@ private EditText mLoginEmailField, mLoginPasswordField;
         String email = mLoginEmailField.getText().toString().trim();
         String password = mLoginPasswordField.getText().toString().trim();
 
+        if (email.length()<5 || password.length()<6) {
+            Toast.makeText(LoginActivity.this, "Error Login/Password", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         if(!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)){
 

@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,6 +18,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -24,6 +28,8 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressDialog mProgress;
     private EditText mNameField, mPasswordField, mEmailField;
     private Button mRegisterBtn;
+    private Pattern pattern;
+    private Matcher matcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,14 @@ public class RegisterActivity extends AppCompatActivity {
         String email = mEmailField.getText().toString().trim();
 
         String password = mPasswordField.getText().toString().trim();
+        if (email.length()<5 || password.length()<6) {
+            Toast.makeText(RegisterActivity.this, "Error Login/Password", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!validate(email)) {  Toast.makeText(RegisterActivity.this, "Invalidate Email", Toast.LENGTH_LONG).show();
+            return;}
+
 
 
         if (!TextUtils.isEmpty(name)&&!TextUtils.isEmpty(email)&&!TextUtils.isEmpty(password)){
@@ -97,5 +111,17 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
+    }
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+                    "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+
+
+    public boolean validate(final String hex) {
+        pattern = Pattern.compile(EMAIL_PATTERN);
+        matcher = pattern.matcher(hex);
+
+        return matcher.matches();
     }
 }

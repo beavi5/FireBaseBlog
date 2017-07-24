@@ -105,6 +105,7 @@ EditText newComment;
 
 
         mLikeBtn= (ImageButton) findViewById(R.id.like_btn_on_single_post);
+
         image = (ImageView) findViewById(R.id.imagePost);
         mSinglePostDesc= (TextView) findViewById(R.id.singlePostDesc);
         mSinglePostTitle= (TextView) findViewById(R.id.singlePostTitle);

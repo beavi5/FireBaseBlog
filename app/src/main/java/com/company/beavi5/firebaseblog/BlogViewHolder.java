@@ -1,5 +1,6 @@
 package com.company.beavi5.firebaseblog;
 
+import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
@@ -19,13 +20,13 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class BlogViewHolder extends RecyclerView.ViewHolder {
-      TextView mLikeCount;
-    ImageButton mDeleteBtn;
-    View mView;
+    public   TextView mLikeCount;
+    public  ImageButton mDeleteBtn;
+    public View mView;
     public ImageButton mLikeBtn;
-    TextView post_title,post_desc, post_username;
-    ImageView image;
-    Button delete_post_btn;
+    public TextView post_title,post_desc, post_username;
+    public ImageView image;
+
 
     DatabaseReference mDatabaseLike;
     FirebaseAuth mAuth;
